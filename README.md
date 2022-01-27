@@ -50,7 +50,7 @@ Cool!
 1. Create the tunnel, start Vagrant and log in.
 
     - Set the GitHub token in the `GITHUB_TOKEN` environment variable.
-    - Set the location of the public server that GitHub will send the Webhook data as `WEBHOOK_URL`.
+    - Set the location of the public server that GitHub will send the webhook data as `WEBHOOK_URL`.
 
           GITHUB_TOKEN=xxxxxxxxxxxxxxx \
           WEBHOOK_URL=https://www.example.com:4141 \
@@ -58,7 +58,7 @@ Cool!
 
     > Make sure your `GITHUB_TOKEN` is in your current environment.  Vagrant will pass this through to the `.bashrc` run command file that is sourced whenever logging into the virtual machine.
 
-1. Create the webhook and start the Go server.
+1. After having logged into the VM, create the webhook and start the Go server.  The `setup.sh` script will have been copied when Vagrant was provisioning the virtual machine.
 
         URL="$WEBHOOK_URL" ./setup.sh
 
@@ -74,7 +74,9 @@ This is a bit more work to setup, but it's worth adding for completeness.
 
 Why `ngrok`?  Well, you may not have root access to a machine and thus no way to configure the SSH server.
 
-How does `ngrok` work?  `ngrok` will create an endpoint in the public Internet which will be used by our GitHub webhook.  GitHub doesn't care what's listening on the port it sends the `tcp` connection to, as long as it's reachable.  From there, `ngrok` takes over and forwards/tunnels the request to our development environment on our local machine.  The only requirement is that the port we gave `ngrok` will creating the tunnel is open.
+How does `ngrok` work?  Well, it sets up a tunnel, just like SSH port forwarding!
+
+`ngrok` will create an endpoint in the public Internet which will be used by our GitHub webhook.  GitHub doesn't care what's listening on the port it sends the `tcp` connection to, as long as it's reachable.  From there, `ngrok` takes over and forwards/tunnels the request to our development environment on our local machine.  The only requirement is that the port we gave `ngrok` when creating the tunnel is open.
 
 1. Start Vagrant.
 
@@ -93,7 +95,7 @@ How does `ngrok` work?  `ngrok` will create an endpoint in the public Internet w
 
     So, it's gross to have to manually copy the URL, but so it goes.  My suggestion would be to use the SSH remote port forwarding method, if possible.
 
-1. Open another window session on the host machine (or use [`screen`] or [`tmux`] another terminal multiplexer).
+1. Open another window session on the host machine (or use [`screen`] or [`tmux`] another terminal multiplexer).  Wait, what?  Why?  It's because we're running `ngrok` in the foreground so we can see its logs, and so we need to create the webhook and start the Go server in another session.
 
     If not using `screen` or `tmux`, export the `GITHUB_TOKEN` and log into the new window session.
 
@@ -116,27 +118,27 @@ There are, of course, many ways in which the web service could be deployed to a 
 
 - Shell script
 
-    + Secure copy (`scp`) the script to the server
-    + Remote execute an SSH command to run it
+    + Secure copy (`scp`) the script to the server.
+    + Remote execute an SSH command to run it.
     + For example, I use [a simple shell script] to build and deploy my own website.
 
 - Jenkins
 
-    + Use either declarative or scripted pipeline
-    + Create an instance in the cloud or server that you own (preferred) as a build agent
-    + Deploy the image
+    + Use either declarative or scripted pipeline.
+    + Create an instance in the cloud or server that you own (preferred) as a build agent.
+    + Deploy the image.
 
 - Terraform
 
-    + Create the server instance in the cloud
-    + Provision using [`Chef`]
-    + Pull the image
+    + Create the server instance in the cloud.
+    + Provision using [`Chef`].
+    + Pull the image.
 
 ## Considerations
 
-- Ease of use
-- The less dependencies the better
-- Use foundational technologies when possible
+- Ease of use.
+- The less dependencies the better.
+- Use foundational technologies when possible.
 
 ## Attribution
 
